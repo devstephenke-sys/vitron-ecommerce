@@ -1,10 +1,10 @@
 """Core application configuration."""
 
 from functools import lru_cache
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -21,7 +21,9 @@ class Settings(BaseSettings):
         default="postgresql+asyncpg://vitron:vitron@localhost:5433/vitron",
         description="SQLAlchemy async connection string (asyncpg driver).",
     )
-    cors_origins: list[str] = Field(
+    # NoDecode keeps the raw comma-separated string so the validator below
+    # can split it (pydantic-settings would otherwise JSON-decode list fields).
+    cors_origins: Annotated[list[str], NoDecode] = Field(
         default_factory=lambda: ["http://localhost:3000", "http://localhost:3001"]
     )
     log_level: str = "INFO"
