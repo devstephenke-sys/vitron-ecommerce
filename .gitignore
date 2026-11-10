@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Build output
+.nuxt/
+.output/
+.dist/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Environment / secrets — never commit real values
+.env
+.env.*
+!.env.example
+
+# Local databases / data volumes
+data/
+*.sqlite3
+
+# Logs
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
