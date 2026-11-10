@@ -1,0 +1,81 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/storefront/**"
+      - "apps/admin/**"
+      - "packages/contracts/**"
+      - ".github/workflows/frontend.yml"
+  pull_request:
+    paths:
+      - "apps/storefront/**"
+      - "apps/admin/**"
+      - "packages/contracts/**"
+      - ".github/workflows/frontend.yml"
+
+jobs:
+  storefront:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/storefront
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: .
+
+      - name: Prepare Nuxt types
+        run: pnpm exec nuxi prepare
+
+      - name: Typecheck
+        run: pnpm exec nuxt typecheck
+
+      - name: Production build
+        run: pnpm build
+
+  admin:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/admin
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: .
+
+      - name: Prepare Nuxt types
+        run: pnpm exec nuxi prepare
+
+      - name: Typecheck
+        run: pnpm exec nuxt typecheck
+
+      - name: Production build
+        run: pnpm build

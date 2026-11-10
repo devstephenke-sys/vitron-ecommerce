@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-Status: Phase 0 plan; execution has not started
+Status: Phase 1 complete on branch `feat/phase-1-foundation` (pending merge); Phases 2+ not started
 Rule: complete each phase with tests, documentation, commit and explicit go/no-go evidence before starting the next dependent phase.
 
 ## Phase 0 — Requirements, architecture and planning (current)
@@ -14,16 +14,18 @@ Deliverables:
 
 Exit gate: business owner reviews currency, availability, taxonomy, payment scope and policy decisions; architecture baseline approved.
 
-## Phase 1 — Repository and backend foundation
+## Phase 1 — Repository and backend foundation — COMPLETE (pending merge)
 
-- Establish monorepo layout: `apps/storefront`, `apps/admin`, `apps/api`, shared contracts/config only where justified.
-- Add backend tooling: Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2, Alembic, Ruff, mypy, Pytest and Docker Compose for local dependencies.
-- Add frontend tooling: Nuxt 3, TypeScript, Pinia, Tailwind CSS, Vitest, Playwright and API client generation.
-- Implement health checks, configuration management, structured logging, error envelope, CORS, request IDs and test harness.
-- Add CI for lint, typecheck, unit/integration tests and migration validation.
-- Write local development and environment documentation.
+Implemented on `feat/phase-1-foundation`:
 
-Exit gate: clean install, backend health endpoint, storefront/admin shells and CI pass on a fresh checkout.
+- Monorepo layout: `apps/api`, `apps/storefront`, `apps/admin`, `packages/contracts`, `infra/`, `.github/workflows/`.
+- Backend tooling: Python 3.12 + `uv`, FastAPI, Pydantic v2, SQLAlchemy 2 (async/asyncpg), Alembic, Ruff, Pytest. (mypy deferred — see `docs/10-decisions-and-risks.md` TD-18.)
+- Frontend tooling: Nuxt 3.21, TypeScript, Pinia, Tailwind CSS, pnpm workspaces, `openapi-typescript` contract generation. (Vitest/Playwright deferred to Phase 3 — TD-17.)
+- Health checks (`/api/v1/health/live`, `/api/v1/health/ready`), pydantic-settings configuration, structured logging with request IDs, standard error envelope, explicit-origin CORS, test harness (6 tests passing).
+- CI: `backend.yml` (ruff, format, pytest, alembic upgrade against Postgres service) and `frontend.yml` (nuxi prepare, typecheck, production build for both apps).
+- Local development: Docker Compose PostgreSQL (host port 5433), verified commands in `docs/07-local-development.md`.
+
+Verified evidence: `uv sync`, `alembic upgrade head` on empty DB, uvicorn serving live/ready endpoints (ready returns 200 with DB, 503 without), `pytest` 6/6, `pnpm install`, `nuxt typecheck` and `nuxt build` for both apps.
 
 ## Phase 2 — Database, identity and authorization
 

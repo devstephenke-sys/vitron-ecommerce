@@ -76,3 +76,26 @@ Start with one default variant per product to match the current catalogue. Add n
 - [x] Testing/deployment/maintenance plans documented.
 - [ ] Business owner approves unresolved decisions or delegates defaults.
 - [ ] Phase 1 implementation may begin after approval.
+
+## 6. Phase 1 implementation decisions
+
+| ID | Decision | Status | Rationale |
+|---|---|---|---|
+| TD-09 | `uv` for Python dependency management (`pyproject.toml` + `uv.lock`) | Implemented | Fast, reproducible installs; single tool for sync/run |
+| TD-10 | `pnpm` workspaces for all JS/TS (`pnpm-workspace.yaml` + `pnpm-lock.yaml`) | Implemented | One lockfile, strict dependency isolation, workspace scripts |
+| TD-11 | Async SQLAlchemy 2 + asyncpg; Alembic runs async migrations via `asyncio.run` in `env.py` | Implemented | Non-blocking DB access; single driver for app and migrations |
+| TD-12 | API contracts: TypeScript types generated from FastAPI OpenAPI via `openapi-typescript` into `packages/contracts` | Implemented | Single source of truth in Pydantic schemas; no hand-maintained duplicates |
+| TD-13 | `@vitron/contracts` consumed by Nuxt apps via `file:` dependency | Implemented | Apps stay independently installable without a publish step |
+| TD-14 | Local Docker PostgreSQL published on host port **5433** | Implemented | Port 5432 was already bound by a local PostgreSQL service on the development machine |
+| TD-15 | Baseline Alembic revision `0001_baseline` is intentionally empty | Implemented | Establishes the migration chain; domain tables arrive per phase |
+| TD-16 | Money representation standardized as `{"amount": "<decimal string>", "currency": "<ISO-4217>"}` | Approved | Consistent contract before client generation; no floats for money |
+| TD-17 | Vitest/Playwright frontend test tooling deferred to Phase 3 | Deferred | Phase 1 scope requires lint/typecheck/build only; UI test harness belongs with the design-system phase |
+| TD-18 | Backend type checking via Ruff + pytest; mypy not configured in Phase 1 | Deferred | Revisit when domain modules grow; noted as a Phase 1/9 quality gate item |
+
+## 7. Phase 1 residual risks
+
+| ID | Risk | Severity | Mitigation |
+|---|---|---|---|
+| R-11 | Async engine/session are module-level singletons; no connection recycling policy yet | Low | `pool_pre_ping` enabled; revisit pooling under Phase 9 load testing |
+| R-12 | No rate limiting, auth or RBAC yet — expected at this phase | Info | Implemented in Phase 2; admin app already guards routes client-side (server enforcement comes with identity) |
+| R-13 | CI frontend jobs run `pnpm install` at workspace root inside each job | Low | Acceptable duplication; can be optimized with a changesets-style filter later |
