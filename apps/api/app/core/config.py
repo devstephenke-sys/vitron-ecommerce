@@ -16,7 +16,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    app_env: Literal["local", "development", "staging", "production"] = "local"
+    app_env: Literal["local", "development", "staging", "production", "test"] = "local"
     database_url: str = Field(
         default="postgresql+asyncpg://vitron:vitron@localhost:5433/vitron",
         description="SQLAlchemy async connection string (asyncpg driver).",
