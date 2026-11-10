@@ -24,7 +24,7 @@ Rule: unresolved business decisions block the affected implementation gate, not 
 | BD-02 | Stock quantities and availability policy | Operations | Phase 5 checkout | Cannot safely enable checkout |
 | BD-03 | Brand ownership for speaker/accessory models | Business owner | Phase 4 import | Misleading catalog taxonomy |
 | BD-04 | Category mapping for TV wall mounts/accessories | Business owner | Phase 1/4 | Incomplete taxonomy |
-| BD-05 | Resolution of catalogue model/description mismatches and 16 missing rows | Supplier | Phase 4 | Incomplete/untrusted catalogue |
+| BD-05 | Resolution of catalogue model/description mismatches and source typos | Supplier | Phase 4 | Untrusted catalogue content |
 | BD-06 | VAT/tax, delivery zones/fees and returns policy | Finance/operations/legal | Phase 5/launch | Checkout totals and legal pages incomplete |
 | BD-07 | Payment providers, merchant accounts and production approval | Business/finance | Phase 7/10 | Payments cannot go live |
 | BD-08 | WhatsApp/email/SMS sender identities and support contacts | Business owner | Phase 8 | Customer communications unavailable |
@@ -35,7 +35,7 @@ Rule: unresolved business decisions block the affected implementation gate, not 
 
 | ID | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|---|
-| R-01 | Catalogue source incomplete or internally inconsistent | High | High | Reconcile 86 visible rows vs 102 declared; supplier validation gate |
+| R-01 | Catalogue source internally inconsistent or contains OCR/source typos | Medium | High | Reconciled 102 rows; supplier validation gate remains |
 | R-02 | Prices published without confirmed currency/authority | Medium | High | Store catalogue price separately; block publication until approved |
 | R-03 | Overselling due to concurrent checkout | Medium | High | Transactional reservations, conditional updates and concurrency tests |
 | R-04 | Duplicate payment callbacks or frontend spoofing | Medium | High | Signature verification, idempotency, server-side status verification |

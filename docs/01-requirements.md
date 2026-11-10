@@ -13,7 +13,7 @@ The storefront and admin dashboard must be independent deployable applications. 
 
 - Current workspace was initially empty and is now connected to the private repository `devstephenke-sys/vitron-ecommerce`, default branch `main`.
 - Repository inspection found one commit, `ef5c44b333f655f6ed6306251d17920aa33e6f09` ("Initial commit"), and only a two-line README. There are no existing application files, tests, CI, or deployment configuration to preserve.
-- The supplied `Vitron_Sonar_Xiaomi_Product_Catalogue.docx` lists 10 category sections and 102 declared model/item entries in its guide. The extracted content visibly includes 86 model rows. The guide does not include TV wall mounts in the product categories, although it separately lists four wall-mount entries. The classification must be reconciled before import.
+- The supplied `Vitron_Sonar_Xiaomi_Product_Catalogue.docx` lists 10 category sections and 102 model/item entries. Table-level extraction confirms 102 data rows, and a flattened catalogue listing supplied during review was checked against the same sections. The guide does not include TV wall mounts in the requested product categories, although it separately lists four wall-mount entries. The classification must be reconciled before import.
 - Catalogue prices have no printed currency. Two TV prices are marked not legible. Several descriptions contain model/capacity mismatches. Images are described in the document as representative links/search results, not confirmed model-specific assets.
 
 ## 3. In-scope functional requirements

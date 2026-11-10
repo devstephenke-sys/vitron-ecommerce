@@ -26,7 +26,7 @@ The repository has been cloned and inspected. No application implementation has 
 
 - Repository `devstephenke-sys/vitron-ecommerce` is private and accessible to the configured GitHub account.
 - `main` contains only the initial README at the time of inspection.
-- The supplied product catalogue declares 102 entries but the extracted visible rows total 86.
+- The supplied product catalogue declares 102 entries; table-level extraction and a flattened listing check confirm 102 rows.
 - Catalogue currency, stock, warranty, verified images and several model/specification details require supplier/business confirmation before publication.
 - Payment integration will remain sandbox/test until provider credentials and business approval are available.
 
