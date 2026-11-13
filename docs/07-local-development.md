@@ -46,7 +46,8 @@ uv run alembic upgrade head                          # apply migrations
 uv run alembic revision --autogenerate -m "message"  # new migration (future phases)
 uv run uvicorn app.main:app --reload --port 8000     # API on :8000
 uv run ruff check . && uv run ruff format --check .  # lint
-uv run pytest -q                                     # tests
+uv run pytest -q                                     # tests (needs Postgres running — see below)
+uv run python scripts/create_admin.py --email you@example.com --password 'a-strong-password'  # first admin
 
 # --- frontend dependencies (repo root, once) ---
 cd ..\..   # or: cd <repo root>
@@ -71,7 +72,7 @@ Each app ships a `.env.example`. Copy to `.env` to override; never commit `.env`
 
 | App | Variables |
 |---|---|
-| `apps/api` | `APP_ENV`, `DATABASE_URL` (asyncpg URL), `CORS_ORIGINS` (comma-separated), `LOG_LEVEL`, `API_V1_PREFIX` |
+| `apps/api` | `APP_ENV`, `DATABASE_URL` (asyncpg URL), `CORS_ORIGINS` (comma-separated), `LOG_LEVEL`, `API_V1_PREFIX`, `AUTH_SECRET_KEY`, `ACCESS_TOKEN_TTL_SECONDS`, `REFRESH_TOKEN_TTL_SECONDS`, `PASSWORD_RESET_TTL_SECONDS` |
 | `apps/storefront` | `NUXT_PUBLIC_API_BASE`, `NUXT_PUBLIC_APP_NAME`, optional `NUXT_API_BASE_SERVER` |
 | `apps/admin` | same as storefront |
 
@@ -92,4 +93,6 @@ TypeScript types for the frontend are generated from the FastAPI OpenAPI schema 
 ## 7. Known local-environment notes
 
 - The Docker Compose PostgreSQL publishes host port **5433** (not 5432) because this development machine already runs a PostgreSQL service on 5432. If your machine has no local PostgreSQL, you may change the mapping back to `5432:5432` and update `DATABASE_URL` accordingly.
+- `uv run pytest` requires a reachable PostgreSQL: the session fixture runs `alembic upgrade head` against `DATABASE_URL`, and DB-backed tests truncate data tables between tests. Start `infra/docker-compose.yml` first.
+- To log in to the admin app locally: run migrations, create an admin with `scripts/create_admin.py`, start the API and `apps/admin` (`pnpm dev`, port 3001), then sign in at `/login`.
 - pnpm warns about ignored build scripts for `esbuild`/`vue-demi` on first install; builds work without approving them, but `pnpm approve-builds` can be used if a tool requires it.

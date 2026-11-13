@@ -1,6 +1,6 @@
 # API Contract Baseline
 
-Status: Phase 0 baseline; health endpoints implemented in Phase 1, OpenAPI available at `/openapi.json`
+Status: Phase 1 health endpoints + Phase 2 auth/account endpoints implemented; OpenAPI available at `/openapi.json`
 Base URL: `/api/v1`
 Conventions: JSON request/response bodies; UUID resource IDs; cursor or offset pagination with documented limits; ISO-8601 UTC timestamps. Money is standardized as an object `{"amount": "<decimal string>", "currency": "<ISO-4217 code>"}` — `amount` is a fixed-precision decimal string (never a float), `currency` is an ISO-4217 alpha-3 code (e.g. `"KES"`). Errors use a stable envelope `{"error": {"code", "message", "request_id", "details?"}}`; implemented in Phase 1.
 
@@ -32,6 +32,8 @@ Conventions: JSON request/response bodies; UUID resource IDs; cursor or offset p
 | GET/POST/DELETE | `/me/wishlist` | Customer | Wishlist operations |
 
 Admin user/role endpoints are under `/admin/users`, `/admin/roles` and require explicit permissions.
+
+Implemented in Phase 2: `POST /auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`, `/auth/password-reset/request`, `/auth/password-reset/confirm`, `GET/PATCH /me`, `GET/POST /me/addresses`, `PATCH/DELETE /me/addresses/{id}`, and `GET /admin/audit-logs` (requires `audit.read`). Token response shape: `{access_token, token_type, expires_in, refresh_token, user, permissions}`. Password-reset emails are not sent yet — delivery arrives with Phase 8 communications; the reset token is only stored hashed.
 
 ## 3. Catalog and discovery
 
