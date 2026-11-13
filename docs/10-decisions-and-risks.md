@@ -89,7 +89,7 @@ Start with one default variant per product to match the current catalogue. Add n
 | TD-14 | Local Docker PostgreSQL published on host port **5433** | Implemented | Port 5432 was already bound by a local PostgreSQL service on the development machine |
 | TD-15 | Baseline Alembic revision `0001_baseline` is intentionally empty | Implemented | Establishes the migration chain; domain tables arrive per phase |
 | TD-16 | Money representation standardized as `{"amount": "<decimal string>", "currency": "<ISO-4217>"}` | Approved | Consistent contract before client generation; no floats for money |
-| TD-17 | Vitest/Playwright frontend test tooling deferred to Phase 3 | Deferred | Phase 1 scope requires lint/typecheck/build only; UI test harness belongs with the design-system phase |
+| TD-17 | Frontend unit/component test tooling: Vitest + `@vue/test-utils` adopted in Phase 3; Playwright E2E still deferred | Partially resolved | Vitest suites now run in CI for both apps (34 tests). Playwright browser E2E deferred to Phase 9 — see TD-28 |
 | TD-18 | Backend type checking via Ruff + pytest; mypy not configured in Phase 1 | Deferred | Revisit when domain modules grow; noted as a Phase 1/9 quality gate item |
 
 ## 7. Phase 1 residual risks
@@ -120,3 +120,14 @@ Start with one default variant per product to match the current catalogue. Add n
 | R-14 | In-memory rate limiter is per-process and resets on restart | Medium | Single-instance deployment only until shared store lands; tracked for Phase 9/10 |
 | R-15 | Refresh token in localStorage is readable by XSS | Medium | Short access-token TTL, CSP/security headers deferred to Phase 9; consider httpOnly cookie flow then |
 | R-16 | Password reset has no delivery channel — tokens accumulate unused | Low | Tokens expire after 1h; Phase 8 adds email adapter and cleanup job |
+
+## 10. Phase 3 implementation decisions
+
+| ID | Decision | Status | Rationale |
+|---|---|---|---|
+| TD-27 | Storefront catalog types are hand-written in `apps/storefront/types/catalog.ts` mirroring docs/04 §3 | Implemented (temporary) | The `/products` API does not exist until Phase 4; local types let the UI be built and tested now. MUST be replaced by `@vitron/contracts` generated types when catalogue endpoints land |
+| TD-28 | Playwright browser E2E remains deferred to Phase 9 | Deferred | Component/store/util Vitest coverage exists now; full browser E2E needs running services + seeded data and fits the Phase 9 test-completion gate |
+| TD-29 | Admin route gating uses `definePageMeta({ permission })` matched against auth-store permissions; nav items filtered client-side | Implemented | UX only — the backend re-authorizes every API call per request (TD-22). Page meta accepts a string or string[] (any-of) |
+| TD-30 | Vitest runs outside Nuxt with `@vitejs/plugin-vue` + happy-dom; stores/components use explicit Vue imports and lazy `useApi()` | Implemented | Keeps unit tests fast and Nuxt-free; auto-imports are unavailable under plain Vitest, so tested modules avoid them |
+| TD-31 | `formatMoney` uses `Intl.NumberFormat("en-KE", KES)` and parses the decimal string only at render time | Implemented | No floats for money math; display-only conversion consistent with TD-16 |
+| TD-32 | Catalog pages render API error/empty states gracefully until Phase 4 endpoints exist | Implemented | `/products` currently 404s; pages show the error state rather than crashing — verified by catalog-store tests |
