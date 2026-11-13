@@ -8,7 +8,8 @@
     "build": "nuxt build",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "test": "vitest run"
   },
   "dependencies": {
     "@pinia/nuxt": "^0.9.0",
@@ -20,7 +21,12 @@
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.12.0",
+    "@types/node": "^22.20.5",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vue/test-utils": "^2.5.1",
+    "happy-dom": "^15.11.7",
     "typescript": "^5.6.0",
+    "vitest": "^3.2.7",
     "vue-tsc": "^2.2.0"
   }
 }

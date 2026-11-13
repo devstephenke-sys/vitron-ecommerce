@@ -45,6 +45,9 @@ jobs:
       - name: Typecheck
         run: pnpm exec nuxt typecheck
 
+      - name: Unit tests
+        run: pnpm test
+
       - name: Production build
         run: pnpm build
 
@@ -76,6 +79,9 @@ jobs:
 
       - name: Typecheck
         run: pnpm exec nuxt typecheck
+
+      - name: Unit tests
+        run: pnpm test
 
       - name: Production build
         run: pnpm build
