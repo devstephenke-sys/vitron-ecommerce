@@ -3,6 +3,11 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-01-01",
   devtools: { enabled: false },
+  // Admin panel is a client-rendered SPA: no SEO requirement, and it
+  // keeps token handling entirely in the browser where the route guard
+  // and auth store live (server-side authorization is enforced by the
+  // API regardless).
+  ssr: false,
 
   modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss"],
 

@@ -20,10 +20,21 @@ export function useApi() {
   )
 
   async function apiFetch<T>(path: string, options: Record<string, unknown> = {}): Promise<T> {
+    // Attach the Bearer token when a session exists. This is transport
+    // only — the backend re-authorizes every request regardless.
+    const auth = useAuthStore()
+    const headers: Record<string, string> = {
+      ...((options.headers as Record<string, string> | undefined) ?? {}),
+    }
+    if (auth.accessToken) {
+      headers.Authorization = `Bearer ${auth.accessToken}`
+    }
+
     try {
       return await $fetch<T>(path, {
         baseURL: baseURL.value,
         ...options,
+        headers,
       })
     } catch (error) {
       const err = error as {
