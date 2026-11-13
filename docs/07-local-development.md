@@ -1,98 +1,95 @@
 # Local Development and Repository Structure
 
-Status: Phase 0 baseline
-Current repository state: private GitHub repo cloned successfully; only `README.md` exists on `main`.
+Status: Phase 1 — commands below were executed and verified on Windows 11 during Phase 1 implementation.
+Repository state: monorepo with `apps/api` (FastAPI), `apps/storefront` and `apps/admin` (Nuxt 3), `packages/contracts`, `infra/` and `.github/workflows/`.
 
-## 1. Proposed repository layout
+## 1. Repository layout (implemented)
 
 ```text
 .
 ├── apps/
-│   ├── api/                 # FastAPI application
-│   ├── storefront/          # Nuxt customer application
-│   └── admin/               # Nuxt administration application
+│   ├── api/                 # FastAPI application (Python 3.12, uv)
+│   ├── storefront/          # Nuxt 3 customer application
+│   └── admin/               # Nuxt 3 administration application
 ├── packages/
-│   └── contracts/           # Optional shared API types; avoid coupling apps to backend internals
-├── docs/
-│   ├── 01-requirements.md
-│   ├── 02-architecture.md
-│   ├── 03-database-schema.md
-│   ├── 04-api-contracts.md
-│   ├── 05-product-catalogue.md
-│   ├── 06-roadmap.md
-│   ├── 07-local-development.md
-│   ├── 08-testing-and-quality.md
-│   ├── 09-deployment.md
-│   ├── 10-decisions-and-risks.md
-│   └── 11-maintenance.md
-├── infra/                   # Docker, CI support, deployment scripts/config templates
-├── .github/workflows/       # CI only; no secrets committed
-├── .env.example             # Variable names only, never values
+│   └── contracts/           # TypeScript types generated from OpenAPI
+├── docs/                    # 01–11 planning and engineering documents
+├── infra/
+│   └── docker-compose.yml   # Local PostgreSQL 16 (host port 5433)
+├── .github/workflows/       # backend.yml, frontend.yml
+├── .env.example             # Shared variable names only
+├── pnpm-workspace.yaml      # pnpm workspace: apps/*, packages/*
 └── README.md
 ```
 
-Do not create empty directories until the corresponding phase begins. Keep backend and frontend dependencies independently installable.
+Applications are independently installable: each Nuxt app has its own `package.json`, `.env.example` and scripts. `@vitron/contracts` is consumed via a `file:` dependency so apps do not require publishing.
 
-## 2. Prerequisites
+## 2. Prerequisites (verified versions)
 
 - Windows 11 with Docker Desktop running.
 - Git.
-- Python 3.12+.
-- Node.js LTS compatible with the selected Nuxt version (verify at Phase 1; current machine reports Node 22.13.1).
-- Package managers pinned by lockfiles (`uv`/`pip` decision and `pnpm`/`npm` decision made in Phase 1).
-- A Neon development branch and local PostgreSQL service/container.
-- Provider sandbox credentials only when the relevant integration phase begins.
+- Python 3.12.3 (verified) with [`uv`](https://docs.astral.sh/uv/) 0.12+.
+- Node.js 22.13.1 LTS (verified) with pnpm 10.x (`corepack enable` or `npm i -g pnpm`).
+- npm 10+ is also present but pnpm is the selected package manager for all JS/TS work.
 
-## 3. Initial local commands (planned, not yet available)
+## 3. Verified local commands
 
 ```powershell
-# backend
+# --- infrastructure ---
+docker compose -f infra/docker-compose.yml up -d     # PostgreSQL on localhost:5433
+docker compose -f infra/docker-compose.yml down
+
+# --- backend (apps/api) ---
 cd apps/api
-uv sync                 # or pip install -e .[dev], depending on Phase 1 decision
-uv run alembic upgrade head
-uv run uvicorn app.main:app --reload --port 8000
+uv sync                                              # creates .venv, installs deps
+uv run alembic upgrade head                          # apply migrations
+uv run alembic revision --autogenerate -m "message"  # new migration (future phases)
+uv run uvicorn app.main:app --reload --port 8000     # API on :8000
+uv run ruff check . && uv run ruff format --check .  # lint
+uv run pytest -q                                     # tests
 
-# storefront
+# --- frontend dependencies (repo root, once) ---
+cd ..\..   # or: cd <repo root>
+pnpm install                                           # installs all workspace projects
+
+# --- storefront (apps/storefront) ---
 cd apps/storefront
-pnpm install
-pnpm dev
+pnpm dev        # http://localhost:3000
+pnpm build      # production build -> .output/
+pnpm exec nuxi prepare && pnpm exec nuxt typecheck
 
-# admin
+# --- admin (apps/admin) ---
 cd apps/admin
-pnpm install
-pnpm dev
+pnpm dev        # http://localhost:3001
+pnpm build
+pnpm exec nuxi prepare && pnpm exec nuxt typecheck
 ```
-
-The exact package manager and commands will be updated after Phase 1 tooling is selected and verified.
 
 ## 4. Environment variables
 
-Use `.env.example` files per app with names only. Required groups:
+Each app ships a `.env.example`. Copy to `.env` to override; never commit `.env`.
 
-- `APP_ENV`, `API_BASE_URL`, `PUBLIC_API_BASE_URL`.
-- Database URL/pooled URL, migration URL and connection limits.
-- JWT/access-token settings, refresh-token encryption/signing keys.
-- CORS origins and trusted proxy settings.
-- Cloudinary/object-storage credentials.
-- Payment provider sandbox credentials and webhook secrets.
-- Email/SMS/WhatsApp provider credentials.
-- Sentry/observability settings if approved.
+| App | Variables |
+|---|---|
+| `apps/api` | `APP_ENV`, `DATABASE_URL` (asyncpg URL), `CORS_ORIGINS` (comma-separated), `LOG_LEVEL`, `API_V1_PREFIX` |
+| `apps/storefront` | `NUXT_PUBLIC_API_BASE`, `NUXT_PUBLIC_APP_NAME`, optional `NUXT_API_BASE_SERVER` |
+| `apps/admin` | same as storefront |
 
-Never commit `.env`, provider secrets, database URLs, webhook secrets or service-account files. Use a secrets manager or platform environment variables in deployed environments.
+`NUXT_PUBLIC_*` values are embedded in the browser bundle — never place secrets there. Server-only secrets belong in `NUXT_*` runtime config or platform env vars.
 
-## 5. Git workflow
+**Neon alternative:** set `DATABASE_URL` in `apps/api/.env` to a Neon development-branch connection string (use the `postgresql+asyncpg://` form; Neon provides `postgresql://` — swap the scheme). Alembic reads the same variable.
 
-- `main` is protected and deployable.
-- Feature branches use `feat/phase-x-description` or `fix/...`.
-- Pull requests require CI, review and documentation updates.
-- Conventional commit messages are preferred but not enforced until Phase 1.
-- Do not commit generated build output, local databases, uploaded files or secrets.
+## 5. API contract type generation
 
-## 6. Current inspection evidence
+TypeScript types for the frontend are generated from the FastAPI OpenAPI schema — see `packages/contracts/README.md`. Short version: start the API, then `cd packages/contracts && pnpm generate`. Commit the regenerated `src/schema.d.ts` with the backend change.
 
-- Workspace path: `C:\Users\DBTECH AFRICA\Desktop\E-SHOP`.
-- Repository clone succeeded from the private GitHub URL.
-- Branch: `main`, tracking `origin/main`.
-- HEAD: `ef5c44b333f655f6ed6306251d17920aa33e6f09` (`Initial commit`).
-- Files at inspection time: `README.md` only.
-- Working tree was clean after clone before documentation was added.
+## 6. Git workflow
+
+- `main` is the deployable branch; work happens on `feat/phase-x-...` branches with pull requests.
+- Conventional commit messages are used.
+- Never commit `.env`, `.venv`, `node_modules`, `.nuxt`, `.output`, local databases or secrets (enforced by `.gitignore`).
+
+## 7. Known local-environment notes
+
+- The Docker Compose PostgreSQL publishes host port **5433** (not 5432) because this development machine already runs a PostgreSQL service on 5432. If your machine has no local PostgreSQL, you may change the mapping back to `5432:5432` and update `DATABASE_URL` accordingly.
+- pnpm warns about ignored build scripts for `esbuild`/`vue-demi` on first install; builds work without approving them, but `pnpm approve-builds` can be used if a tool requires it.

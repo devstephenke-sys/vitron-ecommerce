@@ -1,0 +1,19 @@
+{
+  "name": "@vitron/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared API contracts for Vitron frontend applications. Types are generated from the FastAPI OpenAPI schema — do not edit schema.d.ts manually.",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts"
+    }
+  },
+  "scripts": {
+    "generate": "node scripts/generate.mjs"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.6.1"
+  }
+}

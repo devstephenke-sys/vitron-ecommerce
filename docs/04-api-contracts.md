@@ -1,15 +1,15 @@
 # API Contract Baseline
 
-Status: Phase 0; subject to OpenAPI refinement in Phase 1
+Status: Phase 0 baseline; health endpoints implemented in Phase 1, OpenAPI available at `/openapi.json`
 Base URL: `/api/v1`
-Conventions: JSON request/response bodies; UUID resource IDs; cursor or offset pagination with documented limits; ISO-8601 UTC timestamps; money as `{ "amount": "1234.50", "currency": "KES" }` or a validated decimal string plus currency field — final representation must be consistent before client generation. Errors use a stable envelope with `code`, `message`, `details` and `request_id`.
+Conventions: JSON request/response bodies; UUID resource IDs; cursor or offset pagination with documented limits; ISO-8601 UTC timestamps. Money is standardized as an object `{"amount": "<decimal string>", "currency": "<ISO-4217 code>"}` — `amount` is a fixed-precision decimal string (never a float), `currency` is an ISO-4217 alpha-3 code (e.g. `"KES"`). Errors use a stable envelope `{"error": {"code", "message", "request_id", "details?"}}`; implemented in Phase 1.
 
 ## 1. Common endpoints
 
 | Method | Path | Access | Purpose |
 |---|---|---|---|
 | GET | `/health/live` | Public | Process liveness |
-| GET | `/health/ready` | Internal/admin | Database and dependency readiness |
+| GET | `/health/ready` | Public (returns no sensitive detail) | Database connectivity readiness; 503 when unavailable |
 | GET | `/meta/currencies` | Public | Approved currencies |
 | GET | `/meta/brands` | Public | Published brands |
 | GET | `/meta/categories` | Public | Published category tree |

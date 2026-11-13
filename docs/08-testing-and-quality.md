@@ -1,6 +1,6 @@
 # Testing and Quality Plan
 
-Status: Phase 0 plan; no test suite exists yet
+Status: Phase 1 foundation in place — backend pytest suite (6 tests: health endpoints, readiness failure path, request IDs, error envelopes) runs in CI; frontend typecheck/build gates in CI. Domain test suites are added per phase.
 Quality principle: critical commerce, inventory and payment behavior must be proven by automated tests before production deployment.
 
 ## 1. Backend tests

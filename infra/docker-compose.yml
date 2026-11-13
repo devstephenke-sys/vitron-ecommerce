@@ -1,0 +1,31 @@
+# Local development infrastructure for the Vitron platform.
+# Usage (from repo root):
+#   docker compose -f infra/docker-compose.yml up -d
+#   docker compose -f infra/docker-compose.yml down
+#
+# This provides only local development services. No production secrets
+# belong here; credentials below are throwaway local-only values.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: vitron-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vitron
+      POSTGRES_PASSWORD: vitron
+      POSTGRES_DB: vitron
+    ports:
+      # Host port 5433 avoids conflicts with any PostgreSQL already
+      # installed on the developer machine (which commonly uses 5432).
+      - "5433:5432"
+    volumes:
+      - vitron-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vitron -d vitron"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  vitron-postgres-data:
