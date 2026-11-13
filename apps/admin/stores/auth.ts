@@ -1,4 +1,5 @@
 import { defineStore } from "pinia"
+import { computed, ref } from "vue"
 
 export interface AuthUser {
   id: string
@@ -36,8 +37,6 @@ interface PersistedSession {
  * held in memory and refreshed on app start.
  */
 export const useAuthStore = defineStore("auth", () => {
-  const { apiFetch } = useApi()
-
   const user = ref<AuthUser | null>(null)
   const permissions = ref<string[]>([])
   const accessToken = ref<string | null>(null)
@@ -93,6 +92,7 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function login(email: string, password: string): Promise<void> {
+    const { apiFetch } = useApi()
     const payload = await apiFetch<TokenResponse>("/auth/login", {
       method: "POST",
       body: { email, password },
@@ -102,6 +102,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   /** Exchange the stored refresh token for a new access token. */
   async function refresh(): Promise<void> {
+    const { apiFetch } = useApi()
     if (!refreshToken.value) throw new Error("No refresh token")
     const payload = await apiFetch<TokenResponse>("/auth/refresh", {
       method: "POST",
@@ -111,6 +112,7 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function logout(): Promise<void> {
+    const { apiFetch } = useApi()
     try {
       if (accessToken.value) {
         await apiFetch("/auth/logout", {
