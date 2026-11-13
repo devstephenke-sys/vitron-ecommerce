@@ -97,5 +97,26 @@ Start with one default variant per product to match the current catalogue. Add n
 | ID | Risk | Severity | Mitigation |
 |---|---|---|---|
 | R-11 | Async engine/session are module-level singletons; no connection recycling policy yet | Low | `pool_pre_ping` enabled; revisit pooling under Phase 9 load testing |
-| R-12 | No rate limiting, auth or RBAC yet — expected at this phase | Info | Implemented in Phase 2; admin app already guards routes client-side (server enforcement comes with identity) |
+| R-12 | No rate limiting, auth or RBAC yet — expected at this phase | Info | **Resolved in Phase 2**: rate limits, JWT auth and DB-checked RBAC implemented |
 | R-13 | CI frontend jobs run `pnpm install` at workspace root inside each job | Low | Acceptable duplication; can be optimized with a changesets-style filter later |
+
+## 8. Phase 2 implementation decisions
+
+| ID | Decision | Status | Rationale |
+|---|---|---|---|
+| TD-19 | Rate limiting uses an in-memory sliding-window limiter (`app/core/ratelimit.py`) | Implemented | Simple and dependency-free for a single API instance; MUST move to a shared store (Redis/DB) before multi-replica deployment — see R-14 |
+| TD-20 | Admin app runs as SPA (`ssr: false`); refresh token persisted in localStorage | Implemented | Admin panel needs no SEO; SPA keeps auth state client-side. Refresh token in localStorage is XSS-exposed — mitigated by short-lived access tokens, httpOnly-cookie migration noted for Phase 9 hardening |
+| TD-21 | Password-reset tokens stored SHA-256 hashed with expiry; email delivery deferred to Phase 8 | Implemented | No mail provider exists yet; `/auth/password-reset/request` always returns 202 without revealing account existence |
+| TD-22 | JWT access tokens carry only `sub`/`type`/`exp` — permissions are re-read from the DB on every request | Implemented | Role/permission changes take effect immediately; a stolen token cannot outlive its 15-minute TTL with stale privileges |
+| TD-23 | Refresh tokens are opaque random values stored hashed, grouped into families with rotation and reuse detection | Implemented | Reuse of a rotated token revokes the entire family (theft signal); logout revokes the family or all user sessions |
+| TD-24 | Roles/permissions seeded inside migration `0002_identity_and_access` | Implemented | Fresh databases get the full RBAC catalogue; seed is idempotent |
+| TD-25 | `scripts/create_admin.py` bootstraps the first administrator | Implemented | No self-service admin registration; role assignment is an operator action |
+| TD-26 | `enum` columns use `native_enum=False` + `values_callable` so DB stores lowercase values with CHECK constraints | Implemented | Avoids PostgreSQL native enum migration pain; matches docs/03 check-constraint rule |
+
+## 9. Phase 2 residual risks
+
+| ID | Risk | Severity | Mitigation |
+|---|---|---|---|
+| R-14 | In-memory rate limiter is per-process and resets on restart | Medium | Single-instance deployment only until shared store lands; tracked for Phase 9/10 |
+| R-15 | Refresh token in localStorage is readable by XSS | Medium | Short access-token TTL, CSP/security headers deferred to Phase 9; consider httpOnly cookie flow then |
+| R-16 | Password reset has no delivery channel — tokens accumulate unused | Low | Tokens expire after 1h; Phase 8 adds email adapter and cleanup job |

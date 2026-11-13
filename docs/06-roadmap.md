@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-Status: Phase 1 complete on branch `feat/phase-1-foundation` (pending merge); Phases 2+ not started
+Status: Phase 1 merged to `main`; Phase 2 implemented on `feat/phase-2-identity-rbac` (pending merge); Phases 3+ not started
 Rule: complete each phase with tests, documentation, commit and explicit go/no-go evidence before starting the next dependent phase.
 
 ## Phase 0 — Requirements, architecture and planning (current)
@@ -27,14 +27,20 @@ Implemented on `feat/phase-1-foundation`:
 
 Verified evidence: `uv sync`, `alembic upgrade head` on empty DB, uvicorn serving live/ready endpoints (ready returns 200 with DB, 503 without), `pytest` 6/6, `pnpm install`, `nuxt typecheck` and `nuxt build` for both apps.
 
-## Phase 2 — Database, identity and authorization
+## Phase 2 — Database, identity and authorization — IMPLEMENTED (pending merge)
 
-- Create initial Alembic schema for users, roles, permissions, addresses, refresh tokens, audit logs and background jobs.
-- Implement Argon2id hashing, login/register, refresh rotation, logout, password reset and rate limits.
-- Implement RBAC dependency checks and audit events.
-- Add database transaction tests and authorization tests.
+Implemented on `feat/phase-2-identity-rbac`:
 
-Exit gate: customer/admin auth tests pass; no secrets in repository; migrations run from empty database.
+- Schema migration `0002_identity_and_access`: users, roles, permissions, role_permissions, user_roles, refresh_tokens, password_reset_tokens, auth_events, addresses, customer_profiles, audit_logs, background_jobs — plus idempotent seed of 4 system roles and 25 permissions.
+- Identity: Argon2id password hashing, register/login (JWT access token + rotating opaque refresh tokens with reuse detection), refresh rotation, logout, password-reset request/confirm (delivery deferred to Phase 8), `/me` profile read/update.
+- Addresses: `/me/addresses` CRUD with per-user ownership enforcement.
+- RBAC: permission catalogue checked server-side per request via `require_permission`/`require_any_permission` dependencies; JWT carries no permission claims; `GET /admin/audit-logs` demonstrates enforcement.
+- Rate limits on auth endpoints (in-memory sliding window — see TD-19 in docs/10).
+- Admin app: real login page, auth store with refresh-token persistence, session hydration plugin, Bearer token injection, sign-out; admin app switched to SPA mode (`ssr: false`).
+- `scripts/create_admin.py` bootstrap for the first administrator.
+- Tests: 33 pytest tests including DB-backed auth flows, refresh-reuse family revocation, password reset, address ownership and RBAC permission matrix — all passing against real PostgreSQL.
+
+Exit gate evidence: customer/admin auth tests pass; no secrets in repository; migrations run from empty database (CI `alembic upgrade head` plus pytest session fixture).
 
 ## Phase 3 — Storefront and admin UI system
 

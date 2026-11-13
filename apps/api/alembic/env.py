@@ -9,14 +9,16 @@ from logging.config import fileConfig
 
 from app.core.config import get_settings
 from app.db.session import Base
+
+# Import model modules here so their tables are registered on Base.metadata.
+from app.modules.accounts import models as _accounts_models  # noqa: F401
+from app.modules.identity import models as _identity_models  # noqa: F401
+from app.modules.platform import models as _platform_models  # noqa: F401
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-
-# Import model modules here so their tables are registered on Base.metadata.
-# Domain models are added in their respective phases.
 
 config = context.config
 config.set_main_option("sqlalchemy.url", get_settings().database_url)

@@ -8,6 +8,11 @@ const navItems = computed(() =>
 )
 
 const isActive = (to: string) => route.path === to
+
+async function onLogout() {
+  await auth.logout()
+  await navigateTo("/login")
+}
 </script>
 
 <template>
@@ -34,6 +39,12 @@ const isActive = (to: string) => route.path === to
       </nav>
       <div class="border-t border-gray-800 px-5 py-4">
         <p class="text-xs text-gray-400 truncate">{{ auth.user?.email ?? "Not signed in" }}</p>
+        <button
+          class="mt-2 text-xs text-gray-400 hover:text-white"
+          @click="onLogout"
+        >
+          Sign out
+        </button>
       </div>
     </aside>
 

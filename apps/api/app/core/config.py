@@ -3,8 +3,12 @@
 from functools import lru_cache
 from typing import Annotated, Literal
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
+
+# Development-only JWT secret. >=32 bytes for HS256; production MUST set
+# AUTH_SECRET_KEY (enforced by the validator below).
+DEV_AUTH_SECRET = "vitron-dev-secret-change-me-0123456789abcdef"  # noqa: S105
 
 
 class Settings(BaseSettings):
@@ -28,6 +32,19 @@ class Settings(BaseSettings):
     )
     log_level: str = "INFO"
     api_v1_prefix: str = "/api/v1"
+
+    # Auth/JWT settings. The default secret is for local development only;
+    # production must override AUTH_SECRET_KEY (enforced below).
+    auth_secret_key: str = DEV_AUTH_SECRET  # noqa: S105
+    access_token_ttl_seconds: int = 900  # 15 minutes
+    refresh_token_ttl_seconds: int = 2_592_000  # 30 days
+    password_reset_ttl_seconds: int = 3_600  # 1 hour
+
+    @model_validator(mode="after")
+    def _reject_default_secret_in_production(self) -> "Settings":
+        if self.is_production and self.auth_secret_key == DEV_AUTH_SECRET:
+            raise ValueError("AUTH_SECRET_KEY must be set to a unique secret in production")
+        return self
 
     @field_validator("cors_origins", mode="before")
     @classmethod

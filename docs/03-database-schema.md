@@ -1,6 +1,6 @@
 # Database Schema Baseline
 
-Status: Phase 0 design; not yet migrated
+Status: Phase 2 migrated — identity/access, addresses, audit_logs and background_jobs tables exist (migration `0002_identity_and_access`); catalog/inventory/commerce tables remain Phase 4+ designs
 Database: Neon PostgreSQL
 Identifier convention: UUID primary keys unless an external immutable identifier is required. All timestamps are timezone-aware UTC. Monetary values use fixed precision (`NUMERIC(14,2)` initially) plus ISO currency code; fractional quantities are not supported initially.
 
