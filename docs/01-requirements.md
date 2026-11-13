@@ -64,7 +64,7 @@ The storefront and admin dashboard must be independent deployable applications. 
 
 | Decision | Proposed default | Gate |
 |---|---|---|
-| Currency and pricing source | Do not publish until Vitron confirms currency (likely KES, but not assumed) and authoritative prices. | Before product publication/checkout |
+| Currency and pricing source | Currency confirmed as KES (2026-11-13). Do not publish until Vitron confirms authoritative sell prices. | Before product publication/checkout |
 | Product availability | Treat unknown stock as unavailable for online purchase; allow quote requests. | Phase 4 |
 | Brands in catalogue rows | Infer brand only where the model/catalogue section establishes it; otherwise require confirmation. | Phase 4 |
 | Wall mounts/accessories | Include as accessories only after taxonomy and brand ownership are confirmed. | Phase 1/4 |

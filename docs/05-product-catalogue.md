@@ -32,14 +32,14 @@ The document guide declares 10 category sections and 102 listed model/item entri
 
 - Preserve exact source model/item text as `source_model` and a normalized `model_number` only when normalization is unambiguous.
 - Preserve source descriptions verbatim in `source_description`; structured attributes must cite their source.
-- Catalogue prices are stored as `catalogue_price` with `price_currency = NULL` until currency is confirmed. Do not label them sell prices.
+- Catalogue prices are stored as `catalogue_price` with `price_currency = 'KES'` (currency confirmed 2026-11-13). Do not label them sell prices until authoritative pricing is approved.
 - `Not legible` prices must import as unavailable/unknown, never zero or estimated.
 - Stock, warranty, dimensions, energy rating, connectivity, ports and images are unknown unless confirmed by supplier documentation.
 - Image links/search-result references are reference metadata only. Do not publish them as verified product images.
 
 ## 4. Required normalization decisions
 
-1. Currency: confirm whether catalogue prices are KES or another currency.
+1. Currency: resolved — catalogue prices are KES (Kenyan Shilling, ISO-4217 `KES`), confirmed 2026-11-13.
 2. Brand ownership: confirm whether every speaker/soundbar/dispenser model belongs to Vitron, Sonar, Xiaomi or is unbranded.
 3. Category mapping: decide whether TV wall mounts are accessories or a separate accessory category.
 4. Model corrections: resolve freezer/blender description mismatches and source typos with supplier.

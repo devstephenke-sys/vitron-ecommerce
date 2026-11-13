@@ -20,7 +20,7 @@ Rule: unresolved business decisions block the affected implementation gate, not 
 
 | ID | Decision | Owner | Needed by | Impact if unresolved |
 |---|---|---|---|---|
-| BD-01 | Catalogue currency and authoritative price list | Business owner/supplier | Phase 4 publication | Products cannot be sold/published online |
+| BD-01 | Catalogue currency and authoritative price list | Business owner/supplier | Phase 4 publication | **Currency resolved 2026-11-13: prices are KES (Kenyan Shilling, ISO-4217 `KES`).** Authoritative price-list sign-off still required before Phase 4 publication |
 | BD-02 | Stock quantities and availability policy | Operations | Phase 5 checkout | Cannot safely enable checkout |
 | BD-03 | Brand ownership for speaker/accessory models | Business owner | Phase 4 import | Misleading catalog taxonomy |
 | BD-04 | Category mapping for TV wall mounts/accessories | Business owner | Phase 1/4 | Incomplete taxonomy |
