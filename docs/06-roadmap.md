@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-Status: Phase 1 and Phase 2 merged to `main`; Phase 3 implemented on `feat/phase-3-ui-system` (pending merge); Phases 4+ not started
+Status: Phases 1-3 merged to `main`; Phase 4 not started (blocked by business decisions)
 Rule: complete each phase with tests, documentation, commit and explicit go/no-go evidence before starting the next dependent phase.
 
 ## Phase 0 — Requirements, architecture and planning (current)
@@ -14,9 +14,9 @@ Deliverables:
 
 Exit gate: business owner reviews currency, availability, taxonomy, payment scope and policy decisions; architecture baseline approved.
 
-## Phase 1 — Repository and backend foundation — COMPLETE (pending merge)
+## Phase 1 — Repository and backend foundation — COMPLETE (merged to main)
 
-Implemented on `feat/phase-1-foundation`:
+Implemented on `feat/phase-1-foundation` and merged:
 
 - Monorepo layout: `apps/api`, `apps/storefront`, `apps/admin`, `packages/contracts`, `infra/`, `.github/workflows/`.
 - Backend tooling: Python 3.12 + `uv`, FastAPI, Pydantic v2, SQLAlchemy 2 (async/asyncpg), Alembic, Ruff, Pytest. (mypy deferred — see `docs/10-decisions-and-risks.md` TD-18.)
@@ -27,9 +27,9 @@ Implemented on `feat/phase-1-foundation`:
 
 Verified evidence: `uv sync`, `alembic upgrade head` on empty DB, uvicorn serving live/ready endpoints (ready returns 200 with DB, 503 without), `pytest` 6/6, `pnpm install`, `nuxt typecheck` and `nuxt build` for both apps.
 
-## Phase 2 — Database, identity and authorization — IMPLEMENTED (pending merge)
+## Phase 2 — Database, identity and authorization — COMPLETE (merged to main)
 
-Implemented on `feat/phase-2-identity-rbac`:
+Implemented on `feat/phase-2-identity-rbac` and merged:
 
 - Schema migration `0002_identity_and_access`: users, roles, permissions, role_permissions, user_roles, refresh_tokens, password_reset_tokens, auth_events, addresses, customer_profiles, audit_logs, background_jobs — plus idempotent seed of 4 system roles and 25 permissions.
 - Identity: Argon2id password hashing, register/login (JWT access token + rotating opaque refresh tokens with reuse detection), refresh rotation, logout, password-reset request/confirm (delivery deferred to Phase 8), `/me` profile read/update.
@@ -42,9 +42,9 @@ Implemented on `feat/phase-2-identity-rbac`:
 
 Exit gate evidence: customer/admin auth tests pass; no secrets in repository; migrations run from empty database (CI `alembic upgrade head` plus pytest session fixture).
 
-## Phase 3 — Storefront and admin UI system — IMPLEMENTED (pending merge)
+## Phase 3 — Storefront and admin UI system — COMPLETE (merged to main)
 
-Implemented on `feat/phase-3-ui-system`:
+Implemented on `feat/phase-3-ui-system` and merged:
 
 - Storefront design system: `UiAlert`, `UiButton`, `UiSpinner`, `EmptyState` primitives plus `ProductCard`, `ProductGrid`, `CatalogToolbar`, `Pagination`, `CatalogBrowser` catalog components; money/date formatting helpers (`formatMoney` renders KES without floats).
 - Storefront pages: home, `/products` listing, `/products/[slug]` detail (gallery, specs, breadcrumbs), `/brands/[slug]`, `/categories/[slug]` — all sharing `CatalogBrowser` with URL-synced search/sort/page state, loading/empty/error states and `useSeoMeta` metadata. Header search and layout/footer shell in `layouts/default.vue`.
