@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-Status: Phases 1-3 merged to `main`; Phase 4 not started (blocked by business decisions)
+Status: Phases 1-3 merged to `main`; Phase 4 blockers resolved (BD-03, BD-04, BD-05, BD-10); Phase 4 implementation in progress
 Rule: complete each phase with tests, documentation, commit and explicit go/no-go evidence before starting the next dependent phase.
 
 ## Phase 0 — Requirements, architecture and planning (current)
