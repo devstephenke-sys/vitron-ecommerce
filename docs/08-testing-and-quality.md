@@ -1,6 +1,6 @@
 # Testing and Quality Plan
 
-Status: Phase 1 foundation in place — backend pytest suite (6 tests: health endpoints, readiness failure path, request IDs, error envelopes) runs in CI; frontend typecheck/build gates in CI. Domain test suites are added per phase.
+Status: Phase 3 in place — backend pytest suite (33 tests: auth flows, RBAC matrix, refresh rotation/reuse, password reset, ownership) runs in CI; frontend Vitest suites (34 tests: utils, components, stores, navigation/auth UX) plus typecheck/build gates run in CI for both Nuxt apps. Domain test suites are added per phase.
 Quality principle: critical commerce, inventory and payment behavior must be proven by automated tests before production deployment.
 
 ## 1. Backend tests
@@ -37,21 +37,23 @@ Quality principle: critical commerce, inventory and payment behavior must be pro
 
 ## 2. Frontend tests
 
-### Storefront
+Tooling (Phase 3, TD-30): Vitest 3 + `@vitejs/plugin-vue` + `@vue/test-utils` + happy-dom, configured per app via `vitest.config.ts`; `pnpm test` runs in Frontend CI. Playwright browser E2E deferred to Phase 9 (TD-28).
 
-- Product card/detail rendering and image fallback.
-- Search/filter state and URL synchronization.
-- Cart state, quantity validation and checkout form validation.
-- Order history and account pages.
-- SEO metadata and accessibility basics.
+### Storefront (27 tests)
 
-### Admin
+- `utils/format`: money formatting (KES, decimal-string amounts, invalid input) and date formatting.
+- `utils/catalog`: query-string building, price/name sorting (priceless items last), text filtering.
+- Components: `ProductCard` (link, price, stock label, image fallback), `Pagination` emit/disable logic, `UiAlert`/`UiButton`/`EmptyState` rendering.
+- `catalog` store: idle state, success population, API error → error state, `fetchProduct` null-on-failure.
 
-- Permission-aware navigation and route guards.
-- Product form validation and publication preview.
-- Inventory adjustment form and stock movement table.
-- Order status actions and confirmation dialogs.
-- Import batch upload/error display.
+Planned next: search/filter URL synchronization, cart/checkout state, SEO metadata, accessibility checks.
+
+### Admin (7 tests)
+
+- Navigation registry: all sections present, permission filtering, permission-free items always visible.
+- Auth store: unauthenticated default, login applies session+permissions, `clearSession` resets, login errors propagate without session.
+
+Planned next: route-middleware permission redirects, product/inventory/order forms, import error display.
 
 ### Browser/end-to-end
 

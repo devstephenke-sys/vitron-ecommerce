@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-Status: Phase 1 merged to `main`; Phase 2 implemented on `feat/phase-2-identity-rbac` (pending merge); Phases 3+ not started
+Status: Phase 1 and Phase 2 merged to `main`; Phase 3 implemented on `feat/phase-3-ui-system` (pending merge); Phases 4+ not started
 Rule: complete each phase with tests, documentation, commit and explicit go/no-go evidence before starting the next dependent phase.
 
 ## Phase 0 — Requirements, architecture and planning (current)
@@ -42,12 +42,18 @@ Implemented on `feat/phase-2-identity-rbac`:
 
 Exit gate evidence: customer/admin auth tests pass; no secrets in repository; migrations run from empty database (CI `alembic upgrade head` plus pytest session fixture).
 
-## Phase 3 — Storefront and admin UI system
+## Phase 3 — Storefront and admin UI system — IMPLEMENTED (pending merge)
 
-- Build responsive design system, navigation, footer, product cards, forms, tables, alerts and loading/error states.
-- Implement public catalog pages, brand/category pages, product detail shell, search/filter UI and SEO metadata.
-- Implement admin shell with permission-aware navigation.
-- Add component, state and form validation tests.
+Implemented on `feat/phase-3-ui-system`:
+
+- Storefront design system: `UiAlert`, `UiButton`, `UiSpinner`, `EmptyState` primitives plus `ProductCard`, `ProductGrid`, `CatalogToolbar`, `Pagination`, `CatalogBrowser` catalog components; money/date formatting helpers (`formatMoney` renders KES without floats).
+- Storefront pages: home, `/products` listing, `/products/[slug]` detail (gallery, specs, breadcrumbs), `/brands/[slug]`, `/categories/[slug]` — all sharing `CatalogBrowser` with URL-synced search/sort/page state, loading/empty/error states and `useSeoMeta` metadata. Header search and layout/footer shell in `layouts/default.vue`.
+- Catalog data layer: Pinia `catalog` store + `~/types/catalog.ts` local types mirroring the planned `/products` contract (replaced by generated contracts when Phase 4 lands — TD-27).
+- Admin: permission-aware route middleware (`definePageMeta({ permission })`, any-of arrays), nav registry (`utils/navigation.ts`) filtered by auth-store permissions, section placeholder pages (catalog/orders/inventory/customers/users) and a working `/audit-logs` page against `GET /admin/audit-logs`.
+- Frontend test tooling (resolves TD-17 for unit/component scope): Vitest 3 + `@vitejs/plugin-vue` + `@vue/test-utils` + happy-dom in both apps; 34 tests covering money/catalog utils, product card/pagination/UI primitives, catalog store state/error paths, admin navigation filtering and auth-store permission UX. `pnpm test` wired into Frontend CI for both apps.
+- Playwright browser E2E remains deferred to Phase 9 (TD-28).
+
+Verified evidence: `pnpm test` 27/27 storefront + 7/7 admin, `nuxt typecheck` clean for both apps, `nuxt build` succeeds for both apps.
 
 Exit gate: accessibility/responsive smoke checks pass; no catalog mutation yet.
 
