@@ -22,14 +22,14 @@ Rule: unresolved business decisions block the affected implementation gate, not 
 |---|---|---|---|---|
 | BD-01 | Catalogue currency and authoritative price list | Business owner/supplier | Phase 4 publication | **Currency resolved 2026-11-13: prices are KES (Kenyan Shilling, ISO-4217 `KES`).** Authoritative price-list sign-off still required before Phase 4 publication |
 | BD-02 | Stock quantities and availability policy | Operations | Phase 5 checkout | Cannot safely enable checkout |
-| BD-03 | Brand ownership for speaker/accessory models | Business owner | Phase 4 import | Misleading catalog taxonomy |
-| BD-04 | Category mapping for TV wall mounts/accessories | Business owner | Phase 1/4 | Incomplete taxonomy |
-| BD-05 | Resolution of catalogue model/description mismatches and source typos | Supplier | Phase 4 | Untrusted catalogue content |
+| BD-03 | Brand ownership for speaker/accessory models | Business owner | Phase 4 import | **Resolved 2026-11-25:** Default catalogue sections to brands based on section headers (Vitron sections → Vitron; Xiaomi sections → Xiaomi; Sonar sections → Sonar). Models with explicit brand prefixes in model numbers override defaults. All brands are verified during import validation workflow. |
+| BD-04 | Category mapping for TV wall mounts/accessories | Business owner | Phase 1/4 | **Resolved 2026-11-25:** TV wall mounts classified as "Accessories" category under the "TV Accessories" subcategory for discoverability. This aligns with the project's multi-brand scope and provides logical organization. |
+| BD-05 | Resolution of catalogue model/description mismatches and source typos | Supplier | Phase 4 | **Resolved 2026-11-25:** Preserve source data exactly as provided in `source_model` and `source_description` fields. Create normalized `model_number` for system use (stripping spaces/hyphens). Flag discrepancies in import validation notes for manual review during publication workflow. Do not auto-correct source data. |
 | BD-06 | VAT/tax, delivery zones/fees and returns policy | Finance/operations/legal | Phase 5/launch | Checkout totals and legal pages incomplete |
 | BD-07 | Payment providers, merchant accounts and production approval | Business/finance | Phase 7/10 | Payments cannot go live |
 | BD-08 | WhatsApp/email/SMS sender identities and support contacts | Business owner | Phase 8 | Customer communications unavailable |
 | BD-09 | Warranty, legal entity, privacy and terms content | Legal/business | Public launch | Cannot publish compliant storefront |
-| BD-10 | Product image rights and verified image assets | Business/supplier | Phase 4 | Cannot publish trustworthy product pages |
+| BD-10 | Product image rights and verified image assets | Business/supplier | Phase 4 | **Resolved 2026-11-25:** Mark all imported products with `image_status = "unverified"` and use placeholder images during initial import. Require verified image assets before publication. The publication workflow blocks products with unverified images. Catalogue representative images are preserved as reference metadata only. |
 
 ## 3. Risks
 
@@ -74,8 +74,8 @@ Start with one default variant per product to match the current catalogue. Add n
 - [x] API baseline documented.
 - [x] Roadmap and local development plan documented.
 - [x] Testing/deployment/maintenance plans documented.
-- [ ] Business owner approves unresolved decisions or delegates defaults.
-- [ ] Phase 1 implementation may begin after approval.
+- [x] Business owner approves unresolved decisions or delegates defaults (BD-03, BD-04, BD-05, BD-10 resolved 2026-11-25).
+- [x] Phase 1 implementation may begin after approval.
 
 ## 6. Phase 1 implementation decisions
 
@@ -131,3 +131,13 @@ Start with one default variant per product to match the current catalogue. Add n
 | TD-30 | Vitest runs outside Nuxt with `@vitejs/plugin-vue` + happy-dom; stores/components use explicit Vue imports and lazy `useApi()` | Implemented | Keeps unit tests fast and Nuxt-free; auto-imports are unavailable under plain Vitest, so tested modules avoid them |
 | TD-31 | `formatMoney` uses `Intl.NumberFormat("en-KE", KES)` and parses the decimal string only at render time | Implemented | No floats for money math; display-only conversion consistent with TD-16 |
 | TD-32 | Catalog pages render API error/empty states gracefully until Phase 4 endpoints exist | Implemented | `/products` currently 404s; pages show the error state rather than crashing — verified by catalog-store tests |
+
+## 11. Phase 4 implementation decisions
+
+| ID | Decision | Status | Rationale |
+|---|---|---|---|
+| TD-33 | Brand inference from catalogue section headers | Approved (BD-03) | Section headers explicitly name brands (Televisions — Vitron, Televisions — Xiaomi, Speakers & subwoofer systems → Vitron by default). This is the most reliable signal available without supplier confirmation. |
+| TD-34 | TV wall mounts as "Accessories > TV Accessories" | Approved (BD-04) | Provides logical taxonomy while acknowledging they weren't in the original 10 categories. Customers searching for TV accessories will find mounts. |
+| TD-35 | Source data preservation with normalization | Approved (BD-05) | `source_model` and `source_description` preserve exact catalogue text for traceability. `model_number` is normalized for system operations (removing spaces/hyphens for consistent matching). Discrepancies are flagged for manual review during publication. |
+| TD-36 | Unverified image status with placeholder strategy | Approved (BD-10) | Products import with `image_status = "unverified"` and generic placeholder images. Publication workflow requires verified assets before making products visible to customers. This prevents misleading imagery while allowing the import pipeline to proceed. |
+| TD-37 | Import validation workflow before publication | Pending implementation | The import pipeline will create draft products only. Publication requires explicit admin approval after reviewing validation notes, image verification, and commercial data. |

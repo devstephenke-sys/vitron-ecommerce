@@ -40,9 +40,9 @@ The document guide declares 10 category sections and 102 listed model/item entri
 ## 4. Required normalization decisions
 
 1. Currency: resolved — catalogue prices are KES (Kenyan Shilling, ISO-4217 `KES`), confirmed 2026-11-13.
-2. Brand ownership: confirm whether every speaker/soundbar/dispenser model belongs to Vitron, Sonar, Xiaomi or is unbranded.
-3. Category mapping: decide whether TV wall mounts are accessories or a separate accessory category.
-4. Model corrections: resolve freezer/blender description mismatches and source typos with supplier.
+2. Brand ownership: **resolved 2026-11-25** — default brands inferred from catalogue section headers (Vitron sections → Vitron; Xiaomi sections → Xiaomi; Sonar sections → Sonar). Models with explicit brand prefixes override defaults. All brands verified during import validation.
+3. Category mapping: **resolved 2026-11-25** — TV wall mounts classified as "Accessories > TV Accessories" for discoverability.
+4. Model corrections: **resolved 2026-11-25** — preserve source data exactly in `source_model` and `source_description`; create normalized `model_number` for system use; flag discrepancies for manual review during publication workflow.
 5. Variant strategy: determine whether finish/capacity differences are variants or separate products.
 6. Price authority: confirm whether catalogue prices are current shop selling prices or wholesale/reference prices.
 
@@ -61,6 +61,6 @@ The document guide declares 10 category sections and 102 listed model/item entri
 
 - Currency and authoritative selling price not confirmed.
 - Stock quantities and fulfilment availability not supplied.
-- Product images are representative, not verified model-specific assets.
-- Some model descriptions/specifications conflict or contain source typos.
+- Product images are representative, not verified model-specific assets. **Resolved 2026-11-25:** Products will import with `image_status = "unverified"` and placeholder images; publication workflow requires verified assets before making products visible.
+- Some model descriptions/specifications conflict or contain source typos. **Resolved 2026-11-25:** Source data preserved; discrepancies flagged for manual review during publication.
 - Legal warranty, returns and tax treatment are not present in the catalogue.
